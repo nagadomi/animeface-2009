@@ -11,6 +11,7 @@ static VALUE cMagick;
 #define NV_MAX_FACE 4096
 #define NV_BIT_SCALE(bits)  (1.0f / (powf(2.0f, bits) - 1.0f))
 #define NV_RMAGICK_DATA_TO_8BIT_FLOAT(x, depth) ((float)(NUM2DBL(x)) * NV_BIT_SCALE(depth) * 255.0f)
+#define NV_TO_RMAGICK_DATA(x, depth) (x * 1/255.0f * pow(2.0, depth))
 
 #define NV_ANIMEFACE_WINDOW_SIZE  42.592f
 #define NV_ANIMEFACE_STEP         4.0f
@@ -21,13 +22,28 @@ nv_conv_imager2nv(nv_matrix_t *bgr, nv_matrix_t *gray,
 				  VALUE im)
 {
 	int y, x,  xsize, ysize, depth;
+	size_t range;
 	VALUE c;
 	ID rb_id_green, rb_id_blue, rb_id_red, rb_id_pixel_color;
 	
 	xsize = NUM2INT(rb_funcall(im, rb_intern("columns"), 0));
 	ysize = NUM2INT(rb_funcall(im, rb_intern("rows"), 0));
-	depth = NUM2INT(rb_const_get(cMagick, rb_intern("QuantumDepth")));
-
+	range = NUM2LONG(rb_const_get(cMagick, rb_intern("QuantumRange")));
+	depth = (int)(log10((range + 1)) / log10(2.0));
+	switch (range) {
+	case 0xff:
+		depth = 8;
+		break;
+	case 0xffff:
+		depth = 16;
+		break;
+	case 0xffffffff:
+		depth = 32;
+		break;
+	default:
+		rb_raise(rb_eRuntimeError, "Unsupported QuantumRange: %zu", range);
+		return;
+	}
 	assert(bgr->rows == gray->rows && bgr->rows == ysize);
 	assert(bgr->cols == gray->cols && bgr->cols == xsize);
 	
@@ -80,6 +96,11 @@ VALUE detect(VALUE im,
 	};
 	static const nv_mlp_t *dir_mlp = &nv_face_mlp_dir;
 	static const nv_mlp_t *parts_mlp = &nv_face_mlp_parts;
+	size_t range;
+	int depth;
+
+	range = NUM2LONG(rb_const_get(cMagick, rb_intern("QuantumRange")));
+	depth = (int)(log10((range + 1)) / log10(2.0));
 	
 	VALUE results = rb_ary_new();
 	VALUE facehash, tmphash1, tmphash2, colors, pixel;
@@ -156,15 +177,15 @@ VALUE detect(VALUE im,
 		rb_hash_aset(facehash, rb_str_new2("face"), tmphash1);
 		
 		pixel = rb_funcall(cMagickPixel, rb_intern("new"), 3,
-						   INT2FIX(face_feature.skin_bgr.v[2]),
-						   INT2FIX(face_feature.skin_bgr.v[1]),
-						   INT2FIX(face_feature.skin_bgr.v[0]));
+						   INT2FIX(NV_TO_RMAGICK_DATA(face_feature.skin_bgr.v[2], depth)),
+						   INT2FIX(NV_TO_RMAGICK_DATA(face_feature.skin_bgr.v[1], depth)),
+						   INT2FIX(NV_TO_RMAGICK_DATA(face_feature.skin_bgr.v[0], depth)));
 		rb_hash_aset(facehash, rb_str_new2("skin_color"), pixel);
 		
 		pixel = rb_funcall(cMagickPixel, rb_intern("new"), 3,
-						   INT2FIX(face_feature.hair_bgr.v[2]),
-						   INT2FIX(face_feature.hair_bgr.v[1]),
-						   INT2FIX(face_feature.hair_bgr.v[0]));
+						   INT2FIX(NV_TO_RMAGICK_DATA(face_feature.hair_bgr.v[2], depth)),
+						   INT2FIX(NV_TO_RMAGICK_DATA(face_feature.hair_bgr.v[1], depth)),
+						   INT2FIX(NV_TO_RMAGICK_DATA(face_feature.hair_bgr.v[0], depth)));
 		rb_hash_aset(facehash, rb_str_new2("hair_color"), pixel);
 		
 		// left_eye x,y,w,h,color[4](b,g,r)
@@ -178,9 +199,9 @@ VALUE detect(VALUE im,
 		colors = rb_ary_new();
 		for (j = 0; j < 4; ++j) {
 			pixel = rb_funcall(cMagickPixel, rb_intern("new"), 3,
-							   INT2FIX(face_feature.left_eye_bgr[j].v[2]),
-							   INT2FIX(face_feature.left_eye_bgr[j].v[1]),
-							   INT2FIX(face_feature.left_eye_bgr[j].v[0]));
+							   INT2FIX(NV_TO_RMAGICK_DATA(face_feature.left_eye_bgr[j].v[2], depth)),
+							   INT2FIX(NV_TO_RMAGICK_DATA(face_feature.left_eye_bgr[j].v[1], depth)),
+							   INT2FIX(NV_TO_RMAGICK_DATA(face_feature.left_eye_bgr[j].v[0], depth)));
 			rb_ary_push(colors, pixel);
 		}
 		rb_hash_aset(tmphash2, rb_str_new2("colors"), colors);
@@ -196,9 +217,9 @@ VALUE detect(VALUE im,
 		colors = rb_ary_new();
 		for (j = 0; j < 4; ++j) {
 			pixel = rb_funcall(cMagickPixel, rb_intern("new"), 3,
-							   INT2FIX(face_feature.right_eye_bgr[j].v[2]),
-							   INT2FIX(face_feature.right_eye_bgr[j].v[1]),
-							   INT2FIX(face_feature.right_eye_bgr[j].v[0]));
+							   INT2FIX(NV_TO_RMAGICK_DATA(face_feature.right_eye_bgr[j].v[2], depth)),
+							   INT2FIX(NV_TO_RMAGICK_DATA(face_feature.right_eye_bgr[j].v[1], depth)),
+							   INT2FIX(NV_TO_RMAGICK_DATA(face_feature.right_eye_bgr[j].v[0], depth)));
 			rb_ary_push(colors, pixel);
 		}
 		rb_hash_aset(tmphash2, rb_str_new2("colors"), colors);
@@ -218,6 +239,7 @@ VALUE detect(VALUE im,
 		rb_hash_aset(tmphash1, rb_str_new2("y"), INT2FIX(face_pos[i].mouth.y));
 		rb_hash_aset(tmphash1, rb_str_new2("width"), INT2FIX(face_pos[i].mouth.width));
 		rb_hash_aset(tmphash1, rb_str_new2("height"), INT2FIX(face_pos[i].mouth.height));
+		rb_hash_aset(facehash, rb_str_new2("mouth"), tmphash1);
 		
 		// chin x, y
 		tmphash1 = rb_hash_new();

@@ -1,11 +1,12 @@
+# coding: utf-8
 # イラストの顔の目の色をクルクルするGIFアニメを作るコマンド
 # AnimeFace-Ruby.tar.gzの最新版(2011/4/11 21時以降)が必要
 # 
 # ruby eyecolor.rb homu.jpg homu.gif
 
 require "rubygems"
-require "RMagick"
-require "AnimeFace"
+require "rmagick"
+require_relative "AnimeFace"
 
 module AnimeFace
   module EyeColor
@@ -17,7 +18,7 @@ module AnimeFace
     end
     
     private
-    S = Magick::MaxRGB * 0.5
+    S = Magick::QuantumRange * 0.5
     B = 0.6
     A = 1.0
     
@@ -60,7 +61,7 @@ module AnimeFace
       Magick::Pixel.from_HSL([hue, saturation, hsl1[2]])
     end
     def self.nn_color_dist(x, data)
-      data.reduce(Magick::MaxRGB * 2) do |min_dist, v|
+      data.reduce(Magick::QuantumRange * 2) do |min_dist, v|
         [min_dist,
          Math.sqrt((x.red - v.red) ** 2 +
                    (x.green - v.green) ** 2 +
