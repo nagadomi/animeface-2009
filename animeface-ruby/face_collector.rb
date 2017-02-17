@@ -36,7 +36,7 @@ Dir.entries(params["src"]).each do |file|
         crop.write(File.join(params["dest"], 
                              sprintf("%s_%d_%d_%d_%d.png", 
                                      File.basename(file).split(".").first,
-                                     face["x"], face["y"], face["width"], face["height"])))
+                                     x, y, x2 - x, y2 - y)))
       end
     rescue => e
       warn e.message
