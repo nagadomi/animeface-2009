@@ -14,6 +14,8 @@
 *.pc
 *.log
 *.out
+Gemfile.lock
+.RUBYARCHDIR.time
 install
 autom4te.cache
 stamp-h1

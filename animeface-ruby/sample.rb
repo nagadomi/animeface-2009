@@ -1,5 +1,4 @@
 require "pp"
-require "rubygems"
 require "rmagick"
 require_relative "AnimeFace"
 
@@ -10,9 +9,12 @@ end
 image = Magick::ImageList.new(ARGV[0])
 output = File.basename(ARGV[0]).split(".").first + "_out.png"
 faces = AnimeFace::detect(image)
+# when you want to change parameter
+# faces = AnimeFace::detect(image, {:step => 2.0, :min_window_size => 24, :threshold => 0.1})
 pp faces
+
 gc = Magick::Draw.new
-gc.stroke = '#33cc66'
+gc.stroke = 'red'
 gc.fill = 'transparent'
 
 faces.each do |ctx|
@@ -38,7 +40,7 @@ faces.each do |ctx|
   hair_gc.draw(image)
 
   score_gc = Magick::Draw.new
-  score_gc.fill = 'gray'
+  score_gc.fill = 'red'
   score_gc.stroke = 'transparent'
   score_gc.pointsize = 16
   score_gc.annotate(image, 0, 0, face["x"], [face["y"]- 2, 0].max, sprintf("%.3f", ctx["likelihood"]))
