@@ -30,7 +30,7 @@ Dir.entries(params["src"]).each do |file|
         if x2 - x != y2 - y
           w = [x2 - x, y2 -y].min
           x2 = x + w
-          y2 = y + y
+          y2 = y + w
         end
         crop = image.crop(x, y, x2 - x, y2 - y, true)
         crop.write(File.join(params["dest"], 
