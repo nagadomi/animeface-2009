@@ -16,6 +16,7 @@ static VALUE cMagick;
 #define NV_ANIMEFACE_WINDOW_SIZE  42.592f
 #define NV_ANIMEFACE_STEP         4.0f
 #define NV_ANIMEFACE_SCALE_FACTOR 1.095f
+#define NV_ANIMEFACE_THRESHOLD    0.5f
 
 static void
 nv_conv_imager2nv(nv_matrix_t *bgr, nv_matrix_t *gray,
@@ -86,7 +87,8 @@ nv_conv_imager2nv(nv_matrix_t *bgr, nv_matrix_t *gray,
 
 VALUE detect(VALUE im,
 			 float min_window_size,
-			 float step, float scale_factor)
+			 float step, float scale_factor,
+			 float threshold)
 {
 	static const nv_mlp_t *detector_mlp = &nv_face_mlp_face_00;
 	static const nv_mlp_t *face_mlp[] = {
@@ -145,7 +147,7 @@ VALUE detect(VALUE im,
 						   dir_mlp,
 						   detector_mlp, face_mlp, 2,
 						   parts_mlp,
-						   step, scale_factor, min_window_size
+						   step, scale_factor, min_window_size, threshold
 		);
 	// analyze face 
 	for (i = 0; i < nface; ++i) {
@@ -276,7 +278,7 @@ float get_option(VALUE hash, const char *key, float defvalue)
 static VALUE
 wrap_detect(int argc, VALUE *argv)
 {
-	float min_window_size, step, scale_factor;
+	float min_window_size, step, scale_factor, threshold;
 	VALUE im, options;
 	
 	if (rb_scan_args(argc, argv, "11", &im, &options) == 2) {
@@ -285,13 +287,15 @@ wrap_detect(int argc, VALUE *argv)
 		min_window_size = get_option(options, "min_window_size", NV_ANIMEFACE_WINDOW_SIZE);
 		step = get_option(options, "step", NV_ANIMEFACE_STEP);
 		scale_factor = get_option(options, "scale_factor", NV_ANIMEFACE_SCALE_FACTOR);
+		threshold = get_option(options, "threshold", NV_ANIMEFACE_THRESHOLD);
 	} else {
 		min_window_size = NV_ANIMEFACE_WINDOW_SIZE;
 		step = NV_ANIMEFACE_STEP;
 		scale_factor = NV_ANIMEFACE_SCALE_FACTOR;
+		threshold = NV_ANIMEFACE_THRESHOLD;
 	}
 
-	return detect(im, min_window_size, step, scale_factor);
+	return detect(im, min_window_size, step, scale_factor, threshold);
 }
 
 void Init_AnimeFace()

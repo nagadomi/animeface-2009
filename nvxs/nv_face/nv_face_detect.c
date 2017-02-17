@@ -20,7 +20,8 @@ nv_face_detect(nv_face_position_t *face_pos,
 			   const nv_mlp_t *parts_mlp,
 			   float step,
 			   float scale_factor,
-			   float min_window_size
+			   float min_window_size,
+			   float threshold
 			   )
 {
 	nv_candidate candidates[NV_FACE_DETECT_MAX_CANDIDATES] = {0}; // max
@@ -101,7 +102,7 @@ nv_face_detect(nv_face_position_t *face_pos,
 					// Šç”»•Ê2
 					z = nv_mlp_bagging_predict_d(bagging_mlp, bagging_mlps, haar[thread_idx], 0, 0);
 				}
-				if (z > 0.5) {
+				if (z > threshold) {
 					// Šç
 #ifdef _OPENMP
 #pragma omp critical

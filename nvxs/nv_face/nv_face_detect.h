@@ -28,7 +28,8 @@ int nv_face_detect(nv_face_position_t *face_pos,
 				   const nv_mlp_t *parts_mlp,
 				   float step,
 				   float scale_factor,
-				   float min_window_size
+				   float min_window_size,
+				   float threshold
 				   );
 
 #if NV_ENABLE_CUDA
