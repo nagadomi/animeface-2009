@@ -2,13 +2,16 @@
 
 The face detector for anime/manga.
 This is similar to [lbpcascade_animeface](https://github.com/nagadomi/lbpcascade_animeface), but it's more accurate and supports facial landmark detection.
-
-![figure/figure.png](imas.png)
-
 I developed this library in 2008~2009.
+
 Orignal website: http://anime.udp.jp/ (in Japanese)
 
-## Install
+![demo](https://raw.githubusercontent.com/nagadomi/animeface-2009/master/figure/imas.png)
+
+(c) namco
+
+
+## Installation
 
 Requirements
 - Ruby
