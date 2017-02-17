@@ -25,19 +25,21 @@ Dir.entries(params["src"]).each do |file|
         x = ([face["x"] - face["width"] * margin, 0].max).to_i
         y = ([face["y"] - face["height"] * margin, 0].max).to_i
         x2 = [x + (face["width"] + face["width"] * margin * 2).to_i, image.columns].min
-        y2 = [y + (face["width"] + face["width"] * margin * 2).to_i, image.rows].min
+        y2 = [y + (face["height"] + face["height"] * margin * 2).to_i, image.rows].min
         
         if x2 - x != y2 - y
           w = [x2 - x, y2 -y].min
           x2 = x + w
-          y2 = y + y
+          y2 = y + w
         end
         crop = image.crop(x, y, x2 - x, y2 - y, true)
         crop.write(File.join(params["dest"], 
                              sprintf("%s_%d_%d_%d_%d.png", 
                                      File.basename(file).split(".").first,
                                      x, y, x2 - x, y2 - y)))
+        crop.dispose
       end
+      image.dispose
     rescue => e
       warn e.message
     end
