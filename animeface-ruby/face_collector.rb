@@ -8,7 +8,7 @@ require "json"
 params = ARGV.getopts("", "src:", "dest:", "threshold:", "margin:")
 
 if params["src"].nil? || params["dest"].nil?
-  warn "usage: #{$0} --src <image dir> --dest <output dir> --threshold <0.0~1.0, defualt: 0.2> --margin <margin, default: 0.1>"
+  warn "usage: #{$0} --src <image dir> --dest <output dir> --threshold <0.0~1.0, default: 0.2> --margin <0.0~, default: 0.1>"
   exit(-1)
 end
 FileUtils.mkdir_p(params["dest"])
