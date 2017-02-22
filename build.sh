@@ -7,6 +7,7 @@ mkdir -p $install_dir
 # nvxs
 cd nvxs
 ./configure --prefix $install_dir
+make all
 make install
 cd ${cdir}
 
