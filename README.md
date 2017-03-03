@@ -8,7 +8,7 @@ Original website: http://anime.udp.jp/ (in Japanese)
 
 ![demo](https://raw.githubusercontent.com/nagadomi/animeface-2009/master/figure/imas.png)
 
-(c) namco
+Figure (c) namco
 
 
 ## Installation
