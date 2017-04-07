@@ -165,7 +165,7 @@ void nv_vector_zero(nv_matrix_t *mat, int m)
 void nv_matrix_copy(nv_matrix_t *dest, int dm, const nv_matrix_t *src, int sm, int count_m)
 {
 	assert(dest->n == src->n);
-	memcpy(&NV_MAT_V(dest, dm, 0), &NV_MAT_V(src, sm, 0), dest->step * count_m * sizeof(float));
+	memmove(&NV_MAT_V(dest, dm, 0), &NV_MAT_V(src, sm, 0), dest->step * count_m * sizeof(float));
 }
 
 void nv_matrix_free(nv_matrix_t **matrix)
@@ -221,7 +221,7 @@ void nv_vector_copy(nv_matrix_t *dest, int dm, const nv_matrix_t *src, int sm)
 {
 	assert(dest->n == src->n);
 
-	memcpy(&NV_MAT_V(dest, dm, 0), &NV_MAT_V(src, sm, 0), dest->step * sizeof(float));
+	memmove(&NV_MAT_V(dest, dm, 0), &NV_MAT_V(src, sm, 0), dest->step * sizeof(float));
 }
 
 void nv_matrix_m(nv_matrix_t *mat, int m)
