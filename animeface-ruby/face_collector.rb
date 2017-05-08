@@ -5,7 +5,34 @@ require "optparse"
 require "fileutils"
 require "json"
 
-params = ARGV.getopts("", "src:", "dest:", "threshold:", "margin:")
+def rotate_image(image, ctx)
+  left_eye = ctx["eyes"]["left"]
+  lex = left_eye["x"]
+  lew = left_eye["width"]
+  ley = left_eye["y"]
+  leh = left_eye["height"]
+
+  right_eye = ctx["eyes"]["right"]
+  rex = right_eye["x"]
+  rew = right_eye["width"]
+  rey = right_eye["y"]
+  reh = right_eye["height"]
+
+  center_eye_x = ((lex + lew / 2) + (rex + rew / 2)) / 2
+  center_eye_y = ((ley + leh / 2) + (rey + reh / 2)) / 2
+
+  chin = ctx["chin"]
+  cx = chin["x"]
+  cy = chin["y"]
+  cw = chin["width"]
+  ch = chin["height"]
+
+  radian = Math.atan2(cy - center_eye_y, cx - center_eye_x)
+  degree = radian * 180 / Math::PI
+  image.rotate(90 - degree)
+end
+
+params = ARGV.getopts("", "src:", "dest:", "threshold:", "margin:", "rotate")
 
 if params["src"].nil? || params["dest"].nil?
   warn "usage: #{$0} --src <image dir> --dest <output dir> --threshold <0.0~1.0, default: 0.2> --margin <0.0~, default: 0.1>"
@@ -32,6 +59,9 @@ Dir.entries(params["src"]).each do |file|
           x2 = x + w
           y2 = y + w
         end
+
+        image = rotate_image(image, ctx) if params["rotate"]
+
         crop = image.crop(x, y, x2 - x, y2 - y, true)
         crop.write(File.join(params["dest"], 
                              sprintf("%s_%d_%d_%d_%d.png", 
