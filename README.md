@@ -18,11 +18,16 @@ Requirements
 - ImageMagick
 - gcc, make
 
+### Ubuntu
 ```
 sudo apt-get install libmagickwand-dev
 sudo gem install rmagick
 ./build.sh
 ```
+
+### Arch Linux
+Install `imagemagick-full` and `ruby-rmagick` from [AUR](https://aur.archlinux.org/),
+and then run `./build.sh`.
 
 ## Run sample code (Ruby)
 
@@ -31,6 +36,18 @@ cd animeface-ruby
 ruby sample.rb <input image>
 ```
 View at `${input_image}_out.png`
+
+## Extract landmarks for a folder of images (Ruby)
+
+First install Ruby package `progress_bar`. Then run:
+
+```
+cd animeface-ruby
+ruby proc_folder.rb <input image folder> <output landmark file>
+```
+
+Each of the lines in the `<output landmark file>` is a JSON string corresponding to a file in `<input image folder>`. 
+View the output file for more details.
 
 ## Create new dataset with animeface-ruby
 
