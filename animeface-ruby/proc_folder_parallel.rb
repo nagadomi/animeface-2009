@@ -23,6 +23,7 @@ output_file = ARGV[1]
 infoss = Parallel.map(files, progress: "Processing images...") do |file|
   image = Magick::ImageList.new(file)
   faces = AnimeFace::detect(image)
+  image.destroy!
 
   res = faces.map do |ctx|
     face = ctx["face"]

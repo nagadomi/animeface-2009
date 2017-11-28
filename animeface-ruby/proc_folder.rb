@@ -25,6 +25,7 @@ files.each do |file|
 
   image = Magick::ImageList.new(file)
   faces = AnimeFace::detect(image)
+  image.destroy!
 
   faces.each_with_index do |ctx, index|
     face = ctx["face"]
