@@ -46,8 +46,11 @@ cd animeface-ruby
 ruby proc_folder.rb <input image folder> <output landmark file>
 ```
 
-Each of the lines in the `<output landmark file>` is a JSON string corresponding to a file in `<input image folder>`. 
+Each of the lines in the `<output landmark file>` is a JSON string corresponding to a file in `<input image folder>`.
 View the output file for more details.
+
+Alternatively, replace `proc_folder.rb` with `proc_folder_parallel.rb` leads to image processing in parallel.
+This requires Ruby package `parallel` and `ruby-progressbar`
 
 ## Create new dataset with animeface-ruby
 

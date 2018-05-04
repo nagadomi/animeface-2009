@@ -3,6 +3,7 @@ require 'json'
 require "rmagick"
 require_relative "AnimeFace"
 require "progress_bar"
+require "parallel"
 
 def get_box(thing)
   keys = Set["x", "y", "width", "height"]
@@ -18,16 +19,13 @@ dir_path = ARGV[0]
 files = Dir["#{dir_path}/*"]
 
 output_file = ARGV[1]
-fout = File.open(output_file, "w")
 
-bar = ProgressBar.new(files.length)
-files.each do |file|
-
+infoss = Parallel.map(files, progress: "Processing images...") do |file|
   image = Magick::ImageList.new(file)
   faces = AnimeFace::detect(image)
   image.destroy!
 
-  faces.each_with_index do |ctx, index|
+  res = faces.map do |ctx|
     face = ctx["face"]
     left_eye = ctx["eyes"]["left"]
     right_eye = ctx["eyes"]["right"]
@@ -35,16 +33,19 @@ files.each do |file|
     likelihood = ctx["likelihood"]
 
     info = {
-      "file" => file,
+      "file" => "" + file,   # clone string object
       "face" => get_box(face),
       "left_eye" => get_box(left_eye),
       "right_eye" => get_box(right_eye),
       "mouth" => get_box(mouth),
       "likelihood" => likelihood
     }
-
-    fout << info.to_json
-    fout << "\n"
-    bar.increment!
+    info
   end
+end
+
+fout = File.open(output_file, "w")
+infoss.flatten(1).each do |info|
+  fout << info.to_json
+  fout << "\n"
 end
