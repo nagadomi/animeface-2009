@@ -6,7 +6,7 @@ I developed this library in 2008~2009.
 
 Original website: http://anime.udp.jp/ (in Japanese)
 
-![demo](https://raw.githubusercontent.com/nagadomi/animeface-2009/master/figure/imas.png)
+![demo](https://user-images.githubusercontent.com/287255/43184397-6a8dd6ca-9023-11e8-8eaa-31a178680878.png)
 
 Figure (c) namco
 
